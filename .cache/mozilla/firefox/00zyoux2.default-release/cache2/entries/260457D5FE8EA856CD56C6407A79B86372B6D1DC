@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head id="head1"><title>
+	基于位姿增量约束的激光雷达固定位姿标定方法及系统
+</title>
+<!-- Bootstrap core CSS -->
+    <link href="https://img.xjishu.com/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://img.xjishu.com/css/style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://img.xjishu.com/js/html5shiv.min.js"></script>
+      <script src="https://img.xjishu.com/js/respond.min.js"></script>
+    <![endif]--><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="applicable-device" content="pc,mobile" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="descriptio" content=".本发明属于机器人技术领域，更具体地，本发明涉及一种基于位姿增量约束的激光雷达固定位姿标定方法及系统。背景技术.agv在现代仓储物流领域中应用得越来越广泛，其定位导航技术的要求也越发重要，其定位依赖激光雷达在agv上的位姿精度，这就需要标定激光雷达在agv上的位姿。普通方法是直接获取雷达安装未知的机械位置尺寸，但是然而机械工装配合是有误差的，机械制造也有误差，甚至雷达数据坐标也并不一定处于雷达中心，所以直接使用机械设计的位姿包含很大的误差，导致agv的定位精度不高。.现有是基于pl-icp" />
+<meta name="keywords" content="" />
+<meta property="og:title" content="基于位姿增量约束的激光雷达固定位姿标定方法及系统" />
+<meta property="og:type" content="book" />
+<meta property="og:url" content="https://www.xjishu.com/zhuanli/55/202111521795.html" />
+<meta property="og:image" content="https://img.xjishu.com/img/zl/2022/3/15/u8diuuqgz.jpg" />
+<meta property="og:site_name" content="X技术" />
+<meta property="og:description" content=".本发明属于机器人技术领域，更具体地，本发明涉及一种基于位姿增量约束的激光雷达固定位姿标定方法及系统。背景技术.agv在现代仓储物流领域中应用得越来越广泛，其定位导航技术的要求也越发重要，其定位依赖激光雷达在agv上的位姿精度，这就需要标定激光雷达在agv上的位姿。普通方法是直接获取雷达安装未知的机械位置尺寸，但是然而机械工装配合是有误差的，机械制造也有误差，甚至雷达数据坐标也并不一定处于雷达中心，所以直接使用机械设计的位姿包含很大的误差，导致agv的定位精度不高。.现有是基于pl-icp" />
+<meta property="og:canonical" content="https://www.xjishu.com/zhuanli/55/202111521795.html" />
+<meta property="og:Author" content="X技术" />
+<meta property="og:Copyright" content="X技术 xjishu.com 版权所有" />
+</head>
+  <body>
+
+<nav class="navbar navbar-diy">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">X技术</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="https://www.xjishu.com/"><img src="https://img.xjishu.com/images/logo.png" width="76" height="30" alt="X技术"></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="https://www.xjishu.com/" title="X技术首页">首页</a></li>
+            
+          </ul>
+          <ul id="topbar1_denglu" class="nav navbar-nav navbar-right">
+            <li><a href="https://www.xjishu.com/login.aspx?form=29262830">登录</a></li>
+            <li><a href="https://www.xjishu.com/reg.aspx?form=29262830">注册</a></li>
+          </ul>
+            
+        </div><!--/.nav-collapse -->
+        <div class="navbar-form navbar-left topsearch" role="search">
+            <input type="text" class="top-control" placeholder="搜索技术资料..." id="patentText" onkeydown= "if(event.keyCode==13){patentS(); return false;}">
+            <button type="submit" class="btn btn-so" onclick="patentS();return false;"></button>
+          </div>
+          
+      </div>
+    </nav>
+<div class="wrap">
+      <div class="container">
+          <div class="row">
+            <div class="col-md-8">
+                <div class="col-box">
+                    <div class="col-article">
+                        <div class="art-header">
+                            <h1 class="title">
+                                基于位姿增量约束的激光雷达固定位姿标定方法及系统
+                            </h1>
+                            <div class="art-meta"><span>文档序号：29262830</span><span>发布日期：2022-03-16 12:40</span><span>阅读：72</span><span>来源：国知局</span></div>
+                            <div class="art-meta"><span>导航：<a href ="https://www.xjishu.com/" title="X技术首页"> X技术</a>&gt;<a href ="https://www.xjishu.com/zhuanli/" title="最新专利"> 最新专利</a>&gt;<a href="https://www.xjishu.com/zhuanli/55/" title="计算;推算;计数设备的制造及其应用技术类专利技术">计算;推算;计数设备的制造及其应用技术</a></span></div>
+                        </div>
+                        <div class="con-box">
+                        <div class="art-body">
+                            <img src="http://img.xjishu.com/img/zl/2022/3/15/u8diuuqgz.jpg" alt="基于位姿增量约束的激光雷达固定位姿标定方法及系统" /><br/><br/>1.本发明属于机器人技术领域，更具体地，本发明涉及一种基于位姿增量约束的激光雷达固定位姿标定方法及系统。<br/><br/><br/><b>背景技术：</b><br/><br/>2.agv在现代仓储物流领域中应用得越来越广泛，其定位导航技术的要求也越发重要，其定位依赖激光雷达在agv上的位姿精度，这就需要标定激光雷达在agv上的位姿。普通方法是直接获取雷达安装未知的机械位置尺寸，但是然而机械工装配合是有误差的，机械制造也有误差，甚至雷达数据坐标也并不一定处于雷达中心，所以直接使用机械设计的位姿包含很大的误差，导致agv的定位精度不高。<br/>3.现有是基于pl-icp获取雷达实时位姿，控制agv原地旋转，获取雷达的实时位姿数据，拟合圆心坐标，控制agv直行获取雷达实时位姿数据，拟合直行方程。通过拟合直线斜率，获取姿态数据，通过原地旋转获取位置数据。但是该方案存在如下问题：agv原地旋转，因为本身里程计的角度数据远没有直行数据可靠，所以旋转角度就包含较大误差，原地旋转必然有更大的累计误差，其次即使数据准确，现实因为车控制中心不在车体中心，因为转动惯量问题会导致车原地旋转出现一定打滑和偏移，所以用原地旋转的方式会有较大限制。<br/><br/><br/><b>技术实现要素：</b><br/><br/>4.本发明提供一种基于位姿增量约束的激光雷达固定位姿标定方法，旨在提高激光雷达在里程计坐标系下的固定位姿标定精度。<br/>5.本发明是这样实现的，一种基于位姿增量约束的激光雷达固定位姿标定方法，所述方法具体包括如下步骤：<br/>6.s1、构建反光板地图，在路径行驶过程中基于反光板实时定位，记录激光雷达位姿lidar_pose<br/>t<br/>及时间戳t，同时记录里程计采集到的里程计位姿odom_pose<br/>t^<br/>及时间戳t^；<br/>7.s2、基于插值法计算里程计在t时刻的位姿odom_pose<br/>t<br/>；<br/>8.s3、计算激光雷达及里程计从t-1时刻到t时刻的增量位姿；<br/>9.s4、基于位姿增量和位姿关系建立闭环约束，基于该闭环约束构建残差代价函数，通过非线性优化得到最小化残差代价的激光雷达固定位姿tf'；<br/>10.s5、基于激光雷达固定位姿tf'进行重投影，删除算重投影误差大的增量位姿对，基于残差代价函数对激光雷达固定位姿tf'进行优化，优化后的激光雷达固定位姿即为激光雷达在里程计坐标系下的固定位姿。<br/>11.进一步的，残差代价函数具体如下：<br/>12.re<br/>t<br/>(tf')＝∑((delta_odom<br/>t<br/>*tf^)-1<br/>*(tf^*delta_lidar<br/>t<br/>))<br/>13.tf^为激光雷达固定位姿的初始值，delta_odom<br/>t<br/>、delta_lidar<br/>t<br/>分别表示里程计、激光雷达在t时刻的增量位姿。<br/>14.进一步的，增量位姿对的删除方法具体如下：<br/>15.计算每对增量位姿对的重投影误差，其计算公式具体如下：<br/>16.error<br/>t<br/>＝((delta_odom<br/>t<br/>*tf<br/>′<br/>)-1<br/>*(tf<br/>′<br/>*delta_lidar<br/>t<br/>))<br/>17.当error<br/>t<br/>值大于设定误差阈值，删除对应的增量位姿对。<br/>18.进一步的，里程计在t时刻的位姿odom_pose<br/>t<br/>计算公式具体如下：<br/>[0019][0020]<br/>其中，时刻t处于t^时刻和t^+1时刻之间，odom_pose<br/>t+1<br/>表示t+1时刻的里程计位姿，odom_pose<br/>t<br/>表示t时刻的里程计位姿。<br/>[0021]<br/>进一步的，所述路径包括直线路段、左转路段及右转路段。<br/>[0022]<br/>本发明是这样实现的，一种基于位姿增量约束的激光雷达固定位姿标定系统，所述系统包括：<br/>[0023]<br/>设于agv上的激光雷达，布置于行驶路径附近的反光板；<br/>[0024]<br/>设于agv上的里程计，与里程计及激光雷达通讯连接的处理单元，处理单元基于上述所述激光雷达的固定位姿标定方法标定激光雷达在里程计坐标系下的固定位姿。<br/>[0025]<br/>进一步的，所述路径包括直线路段、左转路段及右转路段。<br/>[0026]<br/>本发明通过高精度的反光板定位，提高了雷达定位数据的精度，进一步提高了标定的精度。此外通过位姿增量标定的方法，不局限于机器人做固定的动作，使得标定过程更灵活和简单，标定方法适应更多车型，扩展了标定算法的适用范围。<br/>附图说明<br/>[0027]<br/>图1为本发明实施例提供的基于位姿增量约束的激光雷达固定位姿标定系统结构示意图；<br/>[0028]<br/>图2为本发明实施例提供的基于位姿增量约束的激光雷达固定位姿标定方法流程图；<br/>[0029]<br/>图3为本发明实施例提供的闭环约束示意图。<br/>具体实施方式<br/>[0030]<br/>下面对照附图，通过对实施例的描述，对本发明的具体实施方式作进一步详细的说明，以帮助本领域的技术人员对本发明的发明构思、技术方案有更完整、准确和深入的理解。<br/>[0031]<br/>图1为本发明实施例提供的基于位姿增量约束的激光雷达固定位姿标定系统的结构示意图，为了便于说明，仅示出于本发明实施例相关的部分，该系统包括：<br/>[0032]<br/>设于agv上的激光雷达，布置于行驶路径附近的反光板；<br/>[0033]<br/>设于agv上的里程计，与里程计及激光雷达通讯连接的处理单元，处理单元基于反光板进行定位，同时计算激光雷达的位姿增量，基于激光雷达获取的位姿增量及里程计读取的位姿增量来标定激光雷达在里程计坐标系下的位姿。<br/>[0034]<br/>所述行驶路径包括直线路段、左转路段及右转路段，以使agv存在直行动作和左右旋转动作，为避免里程计增量数据较大的累计误差和车打滑，速度控制量要一直不断，不能<br/>让车停止和有较大的加减速操作，增量最好同时包含直行和旋转数据，否则增量数据对标定结果的自由度约束不足。<br/>[0035]<br/>图2为本发明实施例提供的基于位姿增量约束的激光雷达固定位姿标定方法流程图，该方法具体包括如下步骤：<br/>[0036]<br/>(1)构建反光板地图，行驶过程中基于反光板实时定位，记录激光雷达位姿及时间戳，同时记录里程计采集到的里程计位姿及时间戳；<br/>[0037]<br/>首先原地不动启动反光板的建图模式，建立反光板地图，反光板地图的构建方法是采用现有的建图方法，然后启动定位模式，激光雷达通过实时识别的反光板，与反光板地图匹配，得到激光雷达在当前时刻t的位姿lidar_pose<br/>t<br/>，记录激光雷达的位姿和时间戳{lidar_pose<br/>t<br/>,t}，放入激光雷达位姿列表；<br/>[0038]<br/>加载里程计数据，记录里程计的位姿和时间戳{odom_pose<br/>t<br/>^,t^}，放入里程计位姿列表中；<br/>[0039]<br/>因为激光雷达数据的频率低于里程计数据，所以以激光雷达数据为基础，在里程计位姿列表中查到对应时刻的里程计数据，因为时间不一定一致，所以还需要进行姿态插值：<br/>[0040][0041]<br/>其中，时刻t处于t^时刻和t^+1时刻之间，这样可以得到激光雷达位姿列表{lidar_pose<br/>t<br/>,t}中同一时刻的里程计位姿态列表{odom_pose<br/>t<br/>,t}。<br/>[0042]<br/>(2)在行驶结束后，计算激光雷达及里程计的位姿增量；<br/>[0043]<br/>激光雷达在t时刻的位姿为lidar_pose<br/>t<br/>，t-1时刻的位姿为lidar_pose<br/>t-1<br/>，那么从t-1时刻到t时刻的激光雷达位姿增量delta_lidar<br/>t<br/>：<br/>[0044][0045]<br/>里程计在t时刻的位姿为odom_pose<br/>t<br/>，t-1时刻的里程计位姿为odom_pose<br/>t-1<br/>，那么从t-1时刻到t时刻的里程计位姿增量delta_odom<br/>t<br/>：<br/>[0046][0047]<br/>然后通过上面两步的计算，得到时刻相同的激光雷达增量位姿列表和里程计增量位姿列表。<br/>[0048]<br/>(4)通过位姿增量和位姿关系，建立闭环约束；<br/>[0049]<br/>在t-1和t时刻，激光雷达在里程计位姿坐标系中的位姿tf都是固定，tf为未知，tf简称激光雷达固定位姿，这里设为元素为零的初始值tf^，tf^＝(0,0,0)。然后两者在各自坐标系下的增量已经确定，那么就可以建立一个闭环约束，如图3所示，认为左右两边是相等：<br/>[0050][0051]<br/>(5)构建代价函数，进行非线性优化；<br/>[0052]<br/>事实上，tf初始值为tf^，各个元素未知，导致左右两边不等，由此建立残差代价函数re：<br/>[0053]<br/>re<br/>t<br/>(tf')＝∑((delta_odom<br/>t<br/>*tf^)-1<br/>*(tf^*delta_lidar<br/>t<br/>))<br/>[0054]<br/>若存在n个增量位姿对，那么上式得到n个残差块，每个残差块包含3个残差项，即关于x、y、θ的三个残差项，(x,y,θ)为位姿，即将所有残差块添加到残差块中，设置迭代条件，使用高斯牛顿优化可得到满足最小化残差代价的tf'，其中，激光雷达增量位姿列表和里程计增量位姿列表均存在时刻相同的n个增量位姿，相同时刻的激光雷达增量位姿与里程计增量位姿构建增量位姿对。<br/>[0055]<br/>(6)根据迭代优化后的激光雷达固定位姿tf'计算重投影误差，通过筛除重投影误差较大的增量位姿对，基于残差代价函数re对激光雷达固定位姿tf'进行优化，优化后的激光雷达固定位姿即为激光雷达在里程计坐标系下的固定位姿；<br/>[0056]<br/>在上一步得到tf'，将其代入到上一步的残差代价函数re，计算每对增量位姿对的重投影误差：<br/>[0057]<br/>error<br/>t<br/>＝((delta_odom<br/>t<br/>*tf<br/>′<br/>)-1<br/>*(tf<br/>′<br/>*delta_lidar<br/>t<br/>))<br/>[0058]<br/>当error<br/>t<br/>值大于设定误差阈值，删除对应的增量位姿对，保留精度较高的增量位姿对，并再带入残差代价函数re中优化，此时以上一步的优化结果tf'为初值，具体如下：<br/>[0059]<br/>re<br/>t<br/>(tf)＝∑((delta_odom<br/>t<br/>*tf')-1<br/>*(tf'*delta_lidar<br/>t<br/>))<br/>[0060]<br/>第二次非线性优化迭代后，得到最终的tf，即是激光雷达在里程计坐标系下的固定姿态。<br/>[0061]<br/>上面结合附图对本发明进行了示例性描述，显然本发明具体实现并不受上述方式的限制，只要采用了本发明的方法构思和技术方案进行的各种非实质性的改进，或未经改进将本发明的构思和技术方案直接应用于其它场合的，均在本发明的保护范围之内。<br/>
+                        </div>
+                        </div>
+                        <div class="gradBox">
+                            
+                        </div>
+
+                        <div class="art-download">
+                                <a href="https://www.xjishu.com/zhuanli/down/29262830.html" class="btn btn-load" target="_blank"><span>完整全部详细技术资料下载</span></a>
+                            </div>
+                            
+                    </div>
+                    <div class="pages">当前第1页<a href="202111521795.html" class="current">1</a>&nbsp;<a href="202111521795_2.html">2</a>&nbsp;</div>
+                    <div class="col-art-footer">
+                        <ul><li><span>该技术已申请专利。仅供学习研究，如用于商业用途，请联系技术所有人。</span></li><li><span>技术研发人员：郝奇 陈智君 郑亮 曹雏清 陈双</span></li><li><span>技术所有人：哈尔滨工业大学芜湖机器人产业技术研究院</span></li><li><span><a href="https://www.xjishu.com/fmr_29262830.html" style="color:#0066CC">我是此专利的发明人</a></span></li></ul>
+                        <ul>
+                            <li><span>上一篇：</span><a href="https://www.xjishu.com/zhuanli/11/202111490500.html">一种防跳齿的上折叠门传动结构及应用的制作方法</a></li><li><span>上一篇：</span><a  href="https://www.xjishu.com/zhuanli/27/202210035029.html">一种脱臭的浓香型茶叶加工的籽油制备装置的制作方法</a></li>
+                        </ul>
+                    </div>
+
+                        
+                        
+                    <div class="col-art-footer">
+                        
+                        </div>
+                </div>
+                <div class="col-box">
+                    <div class="col-sub-tit"><span class="tit">相关技术</span></div>
+                    <div class="col-body">
+                        <ul class="col-relation">
+                            
+                            
+                            
+
+
+                                <li><a href="https://www.xjishu.com/zhuanli/55/202111521754.html"  title="投保数据的检测方法、装置、设备及介质">投保数据的检测方法、装置、设...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111521737.html"  title="反洗钱识别方法、装置、计算机设备及存储介质">反洗钱识别方法、装置、计算机...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202210034939.html"  title="一种软件图形接口测试程序链接固定装置及服务器">一种软件图形接口测试程序链接...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111521645.html"  title="多节点日志分析处理方法及系统">多节点日志分析处理方法及系统...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202210034932.html"  title="一种多源适配的数据加密封装方法及终端">一种多源适配的数据加密封装方...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111436310.html"  title="车辆停靠点聚类的方法、装置、设备及存储介质">车辆停靠点聚类的方法、装置、...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111490405.html"  title="基于二维卷积神经网络的损伤识别方法及设备">基于二维卷积神经网络的损伤识...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111521629.html"  title="一种信息推送方法、装置、设备及介质">一种信息推送方法、装置、设备...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202120807229.html"  title="多模态身份核验智能测温设备及电子系统">多模态身份核验智能测温设备及...</a></li><li><a href="https://www.xjishu.com/zhuanli/55/202111490392.html"  title="一种固态硬盘的读重试操作执行方法及其应用">一种固态硬盘的读重试操作执行...</a></li>
+
+
+                            
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-box">
+                    <div class="col-sub-tit">
+                        <span class="tit">网友询问留言</span>
+                        <span class="raty-tit">已有<i>0</i>条留言</span>
+                    </div>
+                    <div class="col-body col-comment-main">
+                        <div class="comment-list">
+                            <span id="liuyan"></span>
+                            <ul>
+
+                                								
+
+						
+<li>还没有人留言评论。精彩留言会获得点赞！</li>
+
+
+                            </ul>
+                        </div>
+                        <div class="pages">
+                         <a href="#" class="current">1</a> 
+                    </div>
+                        <!-- 评价 -->
+                        <div class="col-comment">
+                            <div class="comment-box">
+                              <textarea name="beizhu" id="beizhu" cols="30" rows="5" class="form-control"></textarea>
+                            </div>
+                            <div class="comment-footer">
+                                <div class="comment-text">精彩留言，会给你点赞！</div>
+                                <button class="btn btn-submit" onclick="add_fb('29262830')" id="tijiaohuifu">发布评论</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" id="fenlei">
+                
+            </div>
+          </div>
+      </div>
+    </div>
+      
+
+    <div class="footer">
+        <p>
+            
+    <a  href="https://www.xjishu.com/about_10.html">使用协议</a><span class="line">|</span>
+    
+    <a  href="https://www.xjishu.com/about_2.html">关于我们</a><span class="line">|</span>
+    
+    <a  href="https://www.xjishu.com/about_3.html">联系X技术</a><span class="line"></span>
+    
+
+        </p>
+        <p> © 2008-2023 <a  href="https://www.xjishu.com/baidulist.aspx" target="_blank">【X技术】</a> 版权所有，并保留所有权利。津ICP备16005673号-2</p>
+    </div>    
+
+  </body>
+</html> 
+    <script src='https://img.xjishu.com/js/jquery.min.js'></script>
+    <script src='https://img.xjishu.com/js/bootstrap.min.js'></script>
+<script src="https://img.xjishu.com/js/jquery.lazyload.js"></script>
+    <script>
+        $(document).ready(function () {
+            var winWidth = document.documentElement.clientWidth;
+            var winHeight = document.documentElement.clientHeight;
+            $('.login-wrap').height(winHeight - 50 - 84);
+
+        });
+
+        $(window).resize(function () {
+            var winWidth = document.documentElement.clientWidth;
+            var winHeight = document.documentElement.clientHeight;
+            $('.login-wrap').height(winHeight - 50 - 84);
+
+        }).resize();
+    </script>
+<script>
+    $(function () {
+        $("img.lazyload").lazyload();
+    });
+    //统计代码
+    var _hmt = _hmt || [];
+    (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?c211ded9353d076e967627b1a8fe9b09";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+<script type="text/javascript">$(document).ready(function () {$("#fenlei").html("专利分类正在加载中....");$("#fenlei").load("https://www.xjishu.com/ashx/fenleishuchu.ashx");});</script>
+<script src="https://img.xjishu.com/js/fed.js"></script>8��b\�      c�ec�eEN�c�e   \    O^partitionKey=%28https%2Cxjishu.com%29,:https://www.xjishu.com/zhuanli/55/202111521795.html necko:classified 1 strongly-framed 1 security-info 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 request-method GET response-head HTTP/2 200 OK
+cache-control: private
+content-type: text/html; charset=utf-8
+server: Microsoft-IIS/10.0
+x-aspnet-version: 4.0.30319
+x-powered-by: ASP.NET
+x-frame-options: SAMEORIGIN
+date: Tue, 28 Feb 2023 02:21:13 GMT
+content-length: 24615
+X-Firefox-Spdy: h2
+ original-response-headers cache-control: private
+content-type: text/html; charset=utf-8
+server: Microsoft-IIS/10.0
+set-cookie: ASP.NET_SessionId=fjioyp2f2awjp3l32wc2fmnr; path=/; HttpOnly; SameSite=Lax
+x-aspnet-version: 4.0.30319
+x-powered-by: ASP.NET
+x-frame-options: SAMEORIGIN
+date: Tue, 28 Feb 2023 02:21:13 GMT
+content-length: 24615
+X-Firefox-Spdy: h2
+ ctid 1 uncompressed-len 0 net-response-time-onstart 558 net-response-time-onstop 569   `'

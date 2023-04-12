@@ -1,0 +1,413 @@
+/*
+ * UpvoteJS - a Stack Exchange look-alike voting widget
+ * ----------------------------------------------------
+ *
+ * UpvoteJS is a widget that generates a voting widget like
+ * the one used on Stack Exchange sites.
+ *
+ * Licensed under Creative Commons Attribution 3.0 Unported
+ * http://creativecommons.org/licenses/by/3.0/
+ *
+ * @version         2.1.0
+ * @since           2018.12.05
+ * @author          Janos Gyerik
+ * @homepage        https://janosgyerik.github.io/upvotejs
+ * @twitter         twitter.com/janosgyerik
+ *
+ * ------------------------------------------------------------------
+ *
+ *  <div id="topic" class="upvotejs">
+ *    <a class="upvote"></a>
+ *    <span class="count"></span>
+ *    <a class="downvote"></a>
+ *    <a class="star"></a>
+ *  </div>
+ *
+ *  Upvote.create('id');
+ *  Upvote.create('id', {count: 5, upvoted: true});
+ *
+ */
+
+const UpvoteJS = function(document) {
+  "use strict";
+
+  const enabledClass = 'upvotejs-enabled';
+  const upvoteClass = 'upvote';
+  const upvoteOnClass = 'upvote-on';
+  const downvoteClass = 'downvote';
+  const downvoteOnClass = 'downvote-on';
+  const starClass = 'star';
+  const starOnClass = 'star-on';
+  const countClass = 'count';
+
+  const Utils = {
+    combine: function() {
+      const combined = {};
+      for (let i = 0; i < arguments.length; i++) {
+        Object.entries(arguments[i])
+          .filter(e => e[1] !== undefined)
+          .forEach(e => combined[e[0]] = e[1]);
+      }
+
+      return combined;
+    },
+    isBoolean: v => typeof v === "boolean",
+    isFunction: v => typeof v === "function",
+    classes: dom => dom.className.split(/ +/).filter(x => x),
+    removeClass: (dom, className) => {
+      dom.className = dom.className.split(/ +/)
+        .filter(x => x)
+        .filter(c => c !== className)
+        .join(' ');
+    },
+    noop: () => {}
+  };
+
+  const Model = function() {
+    const validate = params => {
+      if (!Number.isInteger(params.count)) {
+        throw 'error: parameter "count" must be a valid integer';
+      }
+      if (!Utils.isBoolean(params.upvoted)) {
+        throw 'error: parameter "upvoted" must be a boolean';
+      }
+      if (!Utils.isBoolean(params.downvoted)) {
+        throw 'error: parameter "downvoted" must be a boolean';
+      }
+      if (!Utils.isBoolean(params.starred)) {
+        throw 'error: parameter "starred" must be a boolean';
+      }
+      if (params.callback && !Utils.isFunction(params.callback)) {
+        throw 'error: parameter "callback" must be a function';
+      }
+      if (params.upvoted && params.downvoted) {
+        throw 'error: parameters "upvoted" and "downvoted" must not be true at the same time';
+      }
+    };
+
+    const create = params => {
+      validate(params);
+
+      const data = Utils.combine(params);
+
+      const upvote = () => {
+        if (data.upvoted) {
+          data.count--;
+        } else {
+          data.count++;
+          if (data.downvoted) {
+            data.downvoted = false;
+            data.count++;
+          }
+        }
+        data.upvoted = !data.upvoted;
+      };
+
+      const downvote = () => {
+        if (data.downvoted) {
+          data.count++;
+        } else {
+          data.count--;
+          if (data.upvoted) {
+            data.upvoted = false;
+            data.count--;
+          }
+        }
+        data.downvoted = !data.downvoted;
+      };
+
+      return {
+        count: () => data.count,
+        upvote: upvote,
+        upvoted: () => data.upvoted,
+        downvote: downvote,
+        downvoted: () => data.downvoted,
+        star: () => data.starred = !data.starred,
+        starred: () => data.starred,
+        data: () => Utils.combine(data)
+      };
+    };
+
+    return {
+      create: create
+    };
+  }();
+
+  const View = function() {
+    const create = id => {
+      const dom = document.getElementById(id);
+      if (dom === null) {
+        throw 'error: element with ID "' + id + '" must exist in the DOM';
+      }
+
+      if (Utils.classes(dom).includes(enabledClass)) {
+        throw 'error: element with ID ' + id + ' is already in use by another upvote controller';
+      }
+      dom.className += ' ' + enabledClass;
+
+      const firstElementByClass = className => {
+        return dom.getElementsByClassName(className)[0];
+      };
+
+      const createCounter = className => {
+        const dom = firstElementByClass(className);
+
+        if (dom === undefined) {
+          return {
+            count: () => undefined,
+            set: Utils.noop
+          };
+        }
+
+        return {
+          count: () => parseInt(dom.innerHTML || 0, 10),
+          set: value => dom.innerHTML = value
+        };
+      };
+
+      const createToggle = (className, activeClassName) => {
+        const createClasses = () => {
+          const classes = {
+            [className]: true,
+            [activeClassName]: false,
+          };
+          item.className.split(/ +/)
+            .filter(x => x)
+            .forEach(className => classes[className] = true);
+          return classes;
+        };
+
+        const formatClassName = () => {
+          return Object.entries(classes)
+            .filter(e => e[1])
+            .map(e => e[0])
+            .join(' ');
+        };
+
+        const item = firstElementByClass(className);
+        if (item === undefined) {
+          return {
+            get: () => false,
+            set: Utils.noop,
+            onClick: Utils.noop
+          };
+        }
+
+        const classes = createClasses();
+
+        return {
+          get: () => classes[activeClassName],
+          set: value => {
+            classes[activeClassName] = value;
+            item.className = formatClassName();
+          },
+          onClick: fun => item.onclick = fun
+        };
+      };
+
+      const render = model => {
+        counter.set(model.count());
+        upvote.set(model.upvoted());
+        downvote.set(model.downvoted());
+        star.set(model.starred());
+      };
+
+      const parseParamsFromDom = () => {
+        return {
+          count: counter.count(),
+          upvoted: upvote.get(),
+          downvoted: downvote.get(),
+          starred: star.get()
+        };
+      };
+
+      const destroy = () => {
+        Utils.removeClass(dom, enabledClass);
+        upvote.onClick(null);
+        downvote.onClick(null);
+        star.onClick(null);
+      };
+
+      const counter = createCounter(countClass);
+      const upvote = createToggle(upvoteClass, upvoteOnClass);
+      const downvote = createToggle(downvoteClass, downvoteOnClass);
+      const star = createToggle(starClass, starOnClass);
+
+      return {
+        render: render,
+        parseParamsFromDom: parseParamsFromDom,
+        onClickUpvote: fun => upvote.onClick(fun),
+        onClickDownvote: fun => downvote.onClick(fun),
+        onClickStar: fun => star.onClick(fun),
+        destroy: destroy
+      };
+    };
+
+    return {
+      create: create
+    };
+  }();
+
+  const create = (id, params = {}) => {
+    var destroyed = false;
+    const view = View.create(id);
+    const domParams = view.parseParamsFromDom();
+    const defaults = {
+      id: id,
+      count: 0,
+      upvoted: false,
+      downvoted: false,
+      starred: false,
+      callback: () => {}
+    };
+    const combinedParams = Utils.combine(defaults, domParams, params);
+    const model = Model.create(combinedParams);
+
+    const throwIfDestroyed = () => {
+      if (destroyed) {
+        throw "fatal: unexpected call to destroyed controller";
+      }
+    };
+
+    const callback = action => {
+      const data = model.data();
+      combinedParams.callback({
+        id: id,
+        action: action,
+        newState: {
+          count: data.count,
+          upvoted: data.upvoted,
+          downvoted: data.downvoted,
+          starred: data.starred
+        }
+      });
+    };
+
+    const upvote = () => {
+      throwIfDestroyed();
+      model.upvote();
+      view.render(model);
+      callback(model.upvoted() ? 'upvote' : 'unupvote');
+    };
+
+    const downvote = () => {
+      throwIfDestroyed();
+      model.downvote();
+      view.render(model);
+      callback(model.downvoted() ? 'downvote' : 'undownvote');
+    };
+
+    const star = () => {
+      throwIfDestroyed();
+      model.star();
+      view.render(model);
+      callback(model.starred() ? 'star' : 'unstar');
+    };
+
+    const destroy = () => {
+      throwIfDestroyed();
+      destroyed = true;
+      view.destroy();
+    };
+
+    view.render(model);
+    view.onClickUpvote(upvote);
+    view.onClickDownvote(downvote);
+    view.onClickStar(star);
+
+    return {
+      id: id,
+      count: () => {
+        throwIfDestroyed();
+        return model.count();
+      },
+      upvote: upvote,
+      upvoted: () => {
+        throwIfDestroyed();
+        return model.upvoted();
+      },
+      downvote: downvote,
+      downvoted: () => {
+        throwIfDestroyed();
+        return model.downvoted();
+      },
+      star: star,
+      starred: () => {
+        throwIfDestroyed();
+        return model.starred();
+      },
+      destroy: destroy
+    };
+  };
+
+  return {
+    create: create
+  };
+};
+
+(function(global, factory) {
+  "use strict";
+
+  if (typeof module === "object" && typeof module.exports === "object") {
+    const create = () => {
+      if (global.document) {
+        return factory(global, true);
+      }
+      return w => {
+        if (!w.document) {
+          throw new Error("UpvoteJS requires a window with a document");
+        }
+        return factory(w);
+      };
+    };
+    module.exports = create();
+  } else {
+    factory(global);
+  }
+})(typeof window !== "undefined" ? window : this, function(window, noGlobal) {
+  const Upvote = UpvoteJS(window.document);
+  if (!noGlobal) {
+    window.Upvote = Upvote;
+  }
+  return Upvote;
+});
+ÉeFšF      cøZcøZEL¶ôcøZ   t    O^partitionKey=%28https%2Crunoob.com%29,:https://static.runoob.com/assets/upvotejs/dist/upvotejs/upvotejs.vanilla.js necko:classified 1 strongly-framed 1 security-info FnhllAKWRHGAlo+ESXykKAAAAAAAAAAAwAAAAAAAAEaphjojH6pBabDSgSnsfLHeAAAAAgAAAAAAAAAAAAAAAAAAAAEAOQFmCjImkVxP+7sgiYWmMt8FvcOXmlQiTNWFiWlrbpbqgwAAAAAAAAX7MIIF9zCCBN+gAwIBAgIQAUBE8EaACF1o4kU5ngMLAzANBgkqhkiG9w0BAQsFADBuMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cuZGlnaWNlcnQuY29tMS0wKwYDVQQDEyRFbmNyeXB0aW9uIEV2ZXJ5d2hlcmUgRFYgVExTIENBIC0gRzEwHhcNMjIwOTIzMDAwMDAwWhcNMjMwOTI0MjM1OTU5WjAcMRowGAYDVQQDExFzdGF0aWMucnVub29iLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALLysPw/xi1eYL/VgiGchOnjpOlePrCrl4MaRg609MJkpFdk3TaazoR9X6wk79ePTcZF4APThOXF7wbPpdElTjwzdIFUEQW4z6xo0Seb6Iu/fbTAR3r4MSH6Irs6NilPYpQcnjOCNCvrmqJA63pz1FPKrOoi+ixa8QcAAsgfJCHPohJkJK41ZPP0Ah66aELiVOsgBFR8iv6AprTPZkIzuJprJfqbRYRVcC3I3RhpbLBdUiUPnmhx2+RsPSiM8KvMzv0AJQSWSox0F1TG+AZHOfPe9tVzG5yx/CD9fOn6UwkfP2QCa5Ryq86qjrIhebcNmPEdN18kpUU8vnJdngh1NhcCAwEAAaOCAuEwggLdMB8GA1UdIwQYMBaAFFV0T7JyT/VgulDR1+ZRXJoBhxrXMB0GA1UdDgQWBBTWnDU9NK3RQgO2ebRU+H+TswnUkDAcBgNVHREEFTATghFzdGF0aWMucnVub29iLmNvbTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMD4GA1UdIAQ3MDUwMwYGZ4EMAQIBMCkwJwYIKwYBBQUHAgEWG2h0dHA6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzCBgAYIKwYBBQUHAQEEdDByMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wSgYIKwYBBQUHMAKGPmh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9FbmNyeXB0aW9uRXZlcnl3aGVyZURWVExTQ0EtRzEuY3J0MAkGA1UdEwQCMAAwggF+BgorBgEEAdZ5AgQCBIIBbgSCAWoBaAB2AOg+0No+9QY1MudXKLyJa8kD08vREWvs62nhd31tBr1uAAABg2gjUYYAAAQDAEcwRQIgL1DYc4ZPRl8cE7XS+cPaMqWyVruKmEFLm1qgBF1gR3UCIQD8iKFq3e9UMpBNVoMWug+/3U1iQ1k9HJZQ1xVvu1u/iQB2ADXPGRu/sWxXvw+tTG1Cy7u2JyAmUeo/4SrvqAPDO9ZMAAABg2gjUV0AAAQDAEcwRQIgPDLBcWaN6c4g1oWwRC9E1dZ2ekjsLDABS6Z2v17rIh8CIQDz+gCyEMzmoUOw1InX+dt52rdJfXOAKDIOTc6Xp5szpQB2ALNzdwfhhFD4Y4bWBancEQlKeS2xZwwLh9zwAw55NqWaAAABg2gjUakAAAQDAEcwRQIgNWpNIxDkUKE2rK0OkE9JGI2/RYVMcy0UlVmnLz7ASS8CIQDt7srk2ppAl5Taw2AL2RoJ3HYM7tGiU3JnlWwpeVxBMDANBgkqhkiG9w0BAQsFAAOCAQEAAsRJmdVDoxb0oPHOZthqAj3tKn2LFY1aZ9GXEpNrGiANDbwNw7cr5yH23njWmPg2WoWatvbZaNW89nU+tkBUJd9GOVEQ7SqIeeqXCuqV6gxIN3pX6ohhfbI8iioXjwyihQfAtLnge+MK6Bwqk3QWUVGS5P7Rwl4GYdnndxmhE5EzqToLRgmhaf9FTxtvxSXjyaQTw50lQAsOdpBsjoTEDe4vtuo9Eui3/0aBCXYKG783g0E1JM952XTd0uE4/cu0OAMKRyhmxwm3tXOJMAEOEJ56Ex3SNAuTHSA+OnohNskuNvYXVa8aK6bHURpIvUj9GGJEeUkLpvhPF0l3SImLBsAvAAMAAAAAAAEBAAAAAAAABngyNTUxOQAAAA5SU0EtUFNTLVNIQTI1NgADZgoyJpFcT/u7IImFpjLfBb3Dl5pUIkzVhYlpa26W6oMAAAAAAAAF+zCCBfcwggTfoAMCAQICEAFARPBGgAhdaOJFOZ4DCwMwDQYJKoZIhvcNAQELBQAwbjELMAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3LmRpZ2ljZXJ0LmNvbTEtMCsGA1UEAxMkRW5jcnlwdGlvbiBFdmVyeXdoZXJlIERWIFRMUyBDQSAtIEcxMB4XDTIyMDkyMzAwMDAwMFoXDTIzMDkyNDIzNTk1OVowHDEaMBgGA1UEAxMRc3RhdGljLnJ1bm9vYi5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCy8rD8P8YtXmC/1YIhnITp46TpXj6wq5eDGkYOtPTCZKRXZN02ms6EfV+sJO/Xj03GReAD04Tlxe8Gz6XRJU48M3SBVBEFuM+saNEnm+iLv320wEd6+DEh+iK7OjYpT2KUHJ4zgjQr65qiQOt6c9RTyqzqIvosWvEHAALIHyQhz6ISZCSuNWTz9AIeumhC4lTrIARUfIr+gKa0z2ZCM7iaayX6m0WEVXAtyN0YaWywXVIlD55ocdvkbD0ojPCrzM79ACUElkqMdBdUxvgGRznz3vbVcxucsfwg/Xzp+lMJHz9kAmuUcqvOqo6yIXm3DZjxHTdfJKVFPL5yXZ4IdTYXAgMBAAGjggLhMIIC3TAfBgNVHSMEGDAWgBRVdE+yck/1YLpQ0dfmUVyaAYca1zAdBgNVHQ4EFgQU1pw1PTSt0UIDtnm0VPh/k7MJ1JAwHAYDVR0RBBUwE4IRc3RhdGljLnJ1bm9vYi5jb20wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjA+BgNVHSAENzA1MDMGBmeBDAECATApMCcGCCsGAQUFBwIBFhtodHRwOi8vd3d3LmRpZ2ljZXJ0LmNvbS9DUFMwgYAGCCsGAQUFBwEBBHQwcjAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29tMEoGCCsGAQUFBzAChj5odHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vRW5jcnlwdGlvbkV2ZXJ5d2hlcmVEVlRMU0NBLUcxLmNydDAJBgNVHRMEAjAAMIIBfgYKKwYBBAHWeQIEAgSCAW4EggFqAWgAdgDoPtDaPvUGNTLnVyi8iWvJA9PL0RFr7Otp4Xd9bQa9bgAAAYNoI1GGAAAEAwBHMEUCIC9Q2HOGT0ZfHBO10vnD2jKlsla7iphBS5taoARdYEd1AiEA/Iihat3vVDKQTVaDFroPv91NYkNZPRyWUNcVb7tbv4kAdgA1zxkbv7FsV78PrUxtQsu7ticgJlHqP+Eq76gDwzvWTAAAAYNoI1FdAAAEAwBHMEUCIDwywXFmjenOINaFsEQvRNXWdnpI7CwwAUumdr9e6yIfAiEA8/oAshDM5qFDsNSJ1/nbedq3SX1zgCgyDk3Ol6ebM6UAdgCzc3cH4YRQ+GOG1gWp3BEJSnktsWcMC4fc8AMOeTalmgAAAYNoI1GpAAAEAwBHMEUCIDVqTSMQ5FChNqytDpBPSRiNv0WFTHMtFJVZpy8+wEkvAiEA7e7K5NqaQJeU2sNgC9kaCdx2DO7RolNyZ5VsKXlcQTAwDQYJKoZIhvcNAQELBQADggEBAALESZnVQ6MW9KDxzmbYagI97Sp9ixWNWmfRlxKTaxogDQ28DcO3K+ch9t541pj4NlqFmrb22WjVvPZ1PrZAVCXfRjlREO0qiHnqlwrqleoMSDd6V+qIYX2yPIoqF48MooUHwLS54HvjCugcKpN0FlFRkuT+0cJeBmHZ53cZoRORM6k6C0YJoWn/RU8bb8Ul48mkE8OdJUALDnaQbI6ExA3uL7bqPRLot/9GgQl2Chu/N4NBNSTPedl03dLhOP3LtDgDCkcoZscJt7VziTABDhCeehMd0jQLkx0gPjp6ITbJLjb2F1WvGiumx1EaSL1I/RhiRHlJC6b4TxdJd0iJiwZmCjImkVxP+7sgiYWmMt8FvcOXmlQiTNWFiWlrbpbqgwAAAAAAAASuMIIEqjCCA5KgAwIBAgIQAnmsRYvBskWr+YBTzSybsTANBgkqhkiG9w0BAQsFADBhMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBDQTAeFw0xNzExMjcxMjQ2MTBaFw0yNzExMjcxMjQ2MTBaMG4xCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xLTArBgNVBAMTJEVuY3J5cHRpb24gRXZlcnl3aGVyZSBEViBUTFMgQ0EgLSBHMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALPeP6wkab41dyQh6mKcoHqt3jRIxW5MDvf9QyiOR7VfFwK656es0UFiIb74N9pRntzF1UgYzDGu3ppZVMdolbxhm6dWS9OK/lFehKNT0OYI9aqk6F+U7cA6jxSC+iDBPXwdF4rs3KRyp3aQn6pjpp1yr7IB6Y4zv72Ee/PlZ/6rK6InC6WpK0nPVOYR7n9iDuPe1E4IxUMBH/T33+3hyuH3dvfgiWUOUkjdpMbyxX+XNle5uEIiyBsi4IvbcTCh8ruifCIi5mDXkZrnMT8nwfYCV6v6kDdXkbgGRLKsR4pucbJtbKqIkUGxuZI2t7pfewKRc5nWecvDBZf3+p1MpA8CAwEAAaOCAU8wggFLMB0GA1UdDgQWBBRVdE+yck/1YLpQ0dfmUVyaAYca1zAfBgNVHSMEGDAWgBQD3lA1VtFMu2bwo+IbG8OXsj3RVTAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBIGA1UdEwEB/wQIMAYBAf8CAQAwNAYIKwYBBQUHAQEEKDAmMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQgYDVR0fBDswOTA3oDWgM4YxaHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0R2xvYmFsUm9vdENBLmNybDBMBgNVHSAERTBDMDcGCWCGSAGG/WwBAjAqMCgGCCsGAQUFBwIBFhxodHRwczovL3d3dy5kaWdpY2VydC5jb20vQ1BTMAgGBmeBDAECATANBgkqhkiG9w0BAQsFAAOCAQEAK3Gp6/aGq7aBZsxf/oQ+TD/BSwW3AU4ETK+GQf2kFzYZkby5SFrHdPomunx2HBzViUchGoofGgg7gHW0W3MlQAXWM0r5LUvStcr82QDWYNPaUy4taCQmyaJ+VB+6wxHstSigOlSNF2a6vg4rgexixeiV4YSB03Yqp2t3TeZHM9ESfkus74nQyW7pRGezj+TC44xCagCQQOzzNmzEAP2SnCrJsNE2DpRVMnL8J6xBRdjmOsC3N6cQuKuRXbzByVBjCqAA8t1L0I+9wXJerLPyErjyrMKWaBFLmfK/AHNF4ZihwPGOc7w6UHczBZXH5RFzJNnww+WnKuTPI0HfnVH8lmYKMiaRXE/7uyCJhaYy3wW9w5eaVCJM1YWJaWtuluqDAAAAAAAAA7MwggOvMIICl6ADAgECAhAIO+BWkEJGsaF1aslZkcdKMA0GCSqGSIb3DQEBBQUAMGExCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMB4XDTA2MTExMDAwMDAwMFoXDTMxMTExMDAwMDAwMFowYTELMAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3LmRpZ2ljZXJ0LmNvbTEgMB4GA1UEAxMXRGlnaUNlcnQgR2xvYmFsIFJvb3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDiO+ERct6opNOjV6pQoo8Ld5DJoqXuEs6WWwEJIMwBk6dOMLdT90PEaQBXneKNIt2HBkAAgQnOzhuDv9/NO3FG4tZmxwWzdicWj3ueHpV97rdIowja1q96DDkGZX9KXR+8F/irvu4o13R/eniZWYVoblwjMku/TsDoWm3jcL93EL/8AfaF2ahEEFgyqXUY1dGivkfiJ2r0mjP4SQhgi9RftDqEv6GqSkx9Ps9PX2x2XqBLN5Ge3CLmbc4UGo5qy/7NsxRkF8dbKZ4yv/Lu+tMLQtSrt0Ey2gzU7/iB1buNWD+1G+hJKKJw2jEE3feyFvJMCk4HqO1KPV61f6OQw68nAgMBAAGjYzBhMA4GA1UdDwEB/wQEAwIBhjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQD3lA1VtFMu2bwo+IbG8OXsj3RVTAfBgNVHSMEGDAWgBQD3lA1VtFMu2bwo+IbG8OXsj3RVTANBgkqhkiG9w0BAQUFAAOCAQEAy5w3qkgTEgr63UScT1Kw9N+uBPV5eQijJBj8SyuEwC251cf+9MEfWMu4bZx6dOeYKasRteNwoKHNTIiZk4yRcOKrDxy+k6n/Y9XkB2DTo7+dWwnx1Y7jU/SOY/o/p9u0Zt9iZtbRbkGN8i216ndKn51Y4itZwEAj7S0ogkU+eVSSJpjggEioN+/w1nlgFt6s6A7NbqxEFzgvSdrhRT4quTZTzzpQBvcu6MRXSWxhIRjVBK14PCw6gGun668VFOnYicG5OGzikWyK/2S5dyVXMMAbJKPh3OnfR3y1tCQIBTDsLb0Lv0W/ULmp8+uYARKtyIjGmDRfjQo8xunVlZVt3gAAAAEAAAACaDIAAQAAAABOdGxzZmxhZ3MweDAwMDAwMDAwOnN0YXRpYy5ydW5vb2IuY29tOjQ0M15wYXJ0aXRpb25LZXk9JTI4aHR0cHMlMkNydW5vb2IuY29tJTI5AQA= request-method GET response-head HTTP/2 200 OK
+content-type: text/javascript
+content-length: 9652
+accept-ranges: bytes
+content-md5: LhpdqlHFPWugCQv0QNDu0g==
+etag: "2E1A5DAA51C53D6BA0090BF440D0EED2"
+last-modified: Thu, 01 Aug 2019 10:23:35 GMT
+x-oss-hash-crc64ecma: 17270094338708005297
+x-oss-object-type: Normal
+x-oss-request-id: 62E10E9C7CF842343987A585
+x-oss-server-time: 19
+x-oss-storage-class: Standard
+x-oss-version-id: null
+date: Fri, 24 Feb 2023 06:32:53 GMT
+age: 2236748
+x-m-log: QNM:cdn-cache-dls-gzgy-gy-4;QNM3/304
+x-m-reqid: g1mPAir8P
+server: openresty
+x-qnm-cache: Hit
+X-Firefox-Spdy: h2
+ original-response-headers server: openresty
+date: Fri, 24 Feb 2023 06:31:44 GMT
+content-type: text/javascript
+content-length: 9652
+accept-ranges: bytes
+age: 2236679
+content-md5: LhpdqlHFPWugCQv0QNDu0g==
+etag: "2E1A5DAA51C53D6BA0090BF440D0EED2"
+last-modified: Thu, 01 Aug 2019 10:23:35 GMT
+x-m-log: QNM:cdn-cache-dls-gzgy-gy-4;QNM3
+x-m-reqid: JqTVper63
+x-oss-hash-crc64ecma: 17270094338708005297
+x-oss-object-type: Normal
+x-oss-request-id: 62E10E9C7CF842343987A585
+x-oss-server-time: 19
+x-oss-storage-class: Standard
+x-oss-version-id: null
+x-qnm-cache: Hit
+X-Firefox-Spdy: h2
+ ctid 2 uncompressed-len 0 net-response-time-onstart 219 net-response-time-onstop 219   %´

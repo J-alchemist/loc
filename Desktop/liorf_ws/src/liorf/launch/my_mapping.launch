@@ -1,0 +1,21 @@
+<launch>
+    <param name="use_sim_time" value="true" />
+
+    <arg name="project" default="liorf"/>
+    
+    <!-- Parameters -->
+    <rosparam file="$(find liorf)/config/kitti_mapping.yaml" command="load" />
+    <!-- <rosparam file="$(find liorf)/config/campus_mapping.yaml" command="load" /> -->
+    <!-- <rosparam file="$(find liorf)/config/my_robot_mapping.yaml" command="load" /> -->
+
+    <!--- LOAM -->
+    <node pkg="$(arg project)" type="$(arg project)_imuPreintegration"   name="$(arg project)_imuPreintegration"    output="screen" 	respawn="false"/> 
+    <node pkg="$(arg project)" type="$(arg project)_imageProjection"     name="$(arg project)_imageProjection"      output="screen"     respawn="false"/>
+    <node pkg="$(arg project)" type="$(arg project)_mapOptmization"      name="$(arg project)_mapOptmization"       output="screen"     respawn="false"/>
+    <!--- Run GPS Odom Node -->
+    <node pkg="$(arg project)" type="$(arg project)_gpsOdometry" name="$(arg project)_gpsOdometry" output="screen"  respawn="false" />
+
+    <!--- Run Rviz-->
+    <node pkg="rviz" type="rviz" name="$(arg project)_rviz" args="-d $(find liorf)/launch/include/config/rviz.rviz" />
+
+</launch>

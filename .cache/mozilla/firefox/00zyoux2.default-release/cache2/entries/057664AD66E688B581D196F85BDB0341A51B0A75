@@ -1,0 +1,319 @@
+
+/* globals importScript */
+var passport=passport||window.passport||{};passport._modulePool=passport._modulePool||{},passport._define=passport._define||function(o,s){passport._modulePool[o]=s&&s()},passport._getModule=passport._getModule||function(o){return passport._modulePool[o]},window.upsmsStore={reg_upsms:"106929130003000002",verify_upsms:"106929130003000004",verify_text_upsms:"1069 2913 0003 000 004"},window.YY_TPL_CONFIG="yylive,yyliveserver,yyanchor,pcyy,yyudbsec,bdgameassist,yoyuyin,";try{if(window.localStorage&&window.localStorage.getItem("upsms-pcApi"))try{window.upsmsStore=JSON.parse(window.localStorage.getItem("upsms-pcApi"))}catch(e){}}catch(e){};
+passport.pop=passport.pop||{},passport.pop.insertScript=passport.pop.insertScript||function(e,s){var t=document,a=t.createElement("SCRIPT");a.type="text/javascript",a.charset="UTF-8",a.readyState?a.onreadystatechange=function(){("loaded"==a.readyState||"complete"==a.readyState)&&(a.onreadystatechange=null,s&&s())}:a.onload=function(){s&&s()},a.src=e,t.getElementsByTagName("head")[0].appendChild(a)},passport.pop.initForceverify=passport.pop.initForceverify||function(e){var s,t={"http:":"http://passport.baidu.com","https:":"https://passport.baidu.com"},a=t[window.location.protocol.toLowerCase()],p={uni_forceverify:"/passApi/js/uni_forceverify_fef48b7.js",lib_rsa:"/passApi/js/lib/rsa_34eb2cc.js",idcard_validate:"/passApi/js/lib/idcard_validate.min_6738f5b.js"},o="/passApi/css/uni_forceverify_9a4941e.css",e=e||{},r=document,e=e||{},n=("_PassUni"+(new Date).getTime(),a+o);return e.cssUrlWrapper&&(n=cssUrlWrapper.join("uni_forceverify.css")),s={show:function(){return s.loadPass(),s},loadPass:function(){var e=r.createElement("link");e.rel="stylesheet",e.type="text/css",e.href=n,e.disabled=!1,e.setAttribute("data-for","result"),r.getElementsByTagName("head")[0].appendChild(e),s.passCallback(),delete s.loadPass},passCallback:function(){if(s.components.length>0)passport.pop.insertScript(s.components.shift(),s.passCallback);else{{var t=passport.pop.Forceverify;new t(e,!0,s)}delete s.passCallback,delete s.components}},components:[]},s.components.push(a+p.uni_forceverify),s.components.push(a+p.lib_rsa),s.components.push(a+p.idcard_validate),e.cache&&s.loadPass(),s};;
+passport.pop=passport.pop||{},passport.pop.insertScript||(passport.pop.insertScript=function(t,e){var s=document.createElement("SCRIPT");s.type="text/javascript",s.charset="UTF-8",s.readyState?s.onreadystatechange=function(){("loaded"===s.readyState||"complete"===s.readyState)&&(s.onreadystatechange=null,e&&e())}:s.onload=function(){e&&e()},s.src=t,document.getElementsByTagName("head")[0].appendChild(s)}),passport.pop.ArmorWidget||(passport.pop.ArmorWidget=function(t,e){if(window.passport_pop_ArmorWidget_instance)return{show:function(){}};window.passport_pop_ArmorWidget_instance=!0;var s={"http:":"http://passport.baidu.com","https:":"https://passport.baidu.com"}[window.location.protocol.toLowerCase()],o={uni_wrapper:[s,"/passApi/js/uni_wrapper.js?cdnversion=3e67bf"].join(""),md5:[s,"/passApi/js/lib/md5.min_8c25c62.js"].join(""),uni_armorwidget:[s,"/passApi/js/uni/armorwidget_ef73b1e.js"].join("")},p=null,e=e||{};p=e.cssDir?e.cssDir+"/uni_armorwidget.css?tt="+(new Date).getTime():[s,"/passApi/css/uni_armorwidget_c2f8a55.css"].join("");var a={show:function(){a.loadStyle(),a.loadScript()},loadStyle:function(){var t=document.createElement("link");t.rel="stylesheet",t.type="text/css",t.href=p,t.disabled=!1,t.setAttribute("data-for","result"),document.getElementsByTagName("head")[0].appendChild(t),delete a.loadStyle},resouses:[o.uni_wrapper,o.md5,o.uni_armorwidget,"https://passport.baidu.com/static/passpc-base/js/ld.min.js","https://wappass.baidu.com/static/waplib/moonshad.js"],loadScript:function(){a.resouses.length>0?passport.pop.insertScript(a.resouses.shift(),a.loadScript):(a.callImp(),delete a.loadScript,delete a.resouses)},callImp:function(){e.onAfterClose=function(){window.passport_pop_ArmorWidget_instance=!1};{var s=passport.pop.ArmorWidgetImp;new s(t,e,!0,this)}}};return e.cache&&a.loadStyle(),a});;
+// 上行短信弹窗组件
+(function () {
+    var passport = window.passport || {};
+    window.upSmsDialog_afterRender = 0;
+    passport.upSmsDialog = function (options) {
+        var me = this;
+        this.domain = {
+            'http:': 'http://passport.baidu.com',
+            'https:': 'https://passport.baidu.com'
+        }[window.location.protocol.toLowerCase()];
+        this.conf = this.asyncOptions({
+            el: '',
+            dymicNum: '222222',
+            dymicPhone: '1069 1661 4912 0000 06',
+            sigin: '9999'
+        }, options);
+        this.dataStore = {
+            sigin: '',
+            dymicNum: '111111',
+            dymicPhone: '1069 1661 4912 0000 06'
+        };
+        this.httpStore = {
+            setChannelUrl: this.domain + '/v3/login/getChannel',
+            createChannelUrl: this.domain + '/channel/unicast'
+        };
+        // console.log('this is upSmsDialog class....', this.conf);
+        this.eleprefix = 'baidu_upsms_' + Date.now();
+        this.base = {
+            setId(id) {
+                return me.eleprefix + '_' + id;
+            },
+            getEleById(id) {
+                return document.getElementById(this.setId(id));
+            },
+            show(id) {
+                if (document.getElementById(this.setId(id))) {
+                    document.getElementById(this.setId(id)).style.display = 'block';
+                }
+            },
+            hide(id) {
+                if (document.getElementById(this.setId(id))) {
+                    document.getElementById(this.setId(id)).style.display = 'none';
+                }
+            },
+            addEvent(ele, type, fun) {
+                if (!ele) {
+                    return false;
+                };
+                if (ele.addEventListener) {
+                    ele.addEventListener(type, fun, false);
+                } else if (ele.attachEvent) {
+                    ele.attachEvent('on' + type, fun);
+                } else {
+                    ele['on' + type] = fun;
+                }
+            },
+            unEvent(ele, type, func) {
+                if (ele.removeEventListener) {
+                    ele.removeEventListener(type, func, false);
+                } else if (ele.detachEvent) {
+                    ele.detachEvent('on' + type, func);
+                } else {
+                    ele['on' + type] = null;
+                }
+            }
+        };
+        this.parentBoxEle = document.getElementById(this.conf.el || '') || document.body;
+        this.init = function () {
+            window.upSmsDialog_afterRender++;
+            if (passport.upSmsDialog_afterRender >= 2) {
+                return;
+            }
+            this.inertCss();
+            this.inertHTMLBody(this.setEvent);
+        };
+        this.inertHTMLBody = function (callback) {
+            var tplArr = ['<div class="upsms-dialog-wrapper" id="',
+                        this.base.setId('upsms-dialog-wrapper'), '"><div class="upsms-dialog-body" id="',
+                        this.base.setId('upsms-dialog-body'), '"><h3 class="upsms-dialog-title">安全提示</h3>',
+                        '<p class="upsms-dialog-content">您当前的操作存在风险,请用该手机号发送短信<b class="color-b" id="',
+                        this.base.setId('upsms-dialog-dymicNum'), '">',
+                        this.dataStore.dymicNum, '</b>到<b class="color-b" id="',
+                        this.base.setId('upsms-dialog-dymicPhone'), '">', this.dataStore.dymicPhone,
+                        '</b>继续验证</p><button class="upsms-dialog-btn" id="',
+                        this.base.setId('upsms-dialog-btn'),, '">确定</button></div></div>'];
+            if (window.upSmsDialog_afterRender < 2) {
+                this.parentBoxEle.insertAdjacentHTML('beforeend', tplArr.join(''));
+                callback && typeof callback === 'function' && callback();
+            };
+        };
+        this.inertCss = function () {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = [this.domain, "/passApi/css/upsms_dialog_8ca74a5.css"].join('');
+            link.disabled = false;
+            document.getElementsByTagName('head')[0].appendChild(link);
+        };
+        this.setEvent = function () {
+            me.base.addEvent(me.base.getEleById('upsms-dialog-btn'), 'click', function () {
+                me.base.hide('upsms-dialog-wrapper');
+                me.conf.closeDialogFn && typeof me.conf.closeDialogFn === 'function' && me.conf.closeDialogFn();
+            });
+        };
+        this.showUpSmsDialog = function (opt) {
+            var options = {
+                from: opt.from || 'init_sence',
+                phoneVal: opt.phoneVal || ''
+            };
+            me._setChannel(options);
+        };
+        this.upSmsDone = function (res) {
+            me.conf.upSmsSuccessFn
+            && typeof me.conf.upSmsSuccessFn === 'function'
+            && me.conf.upSmsSuccessFn(res, me.dataStore);
+            me._stopChannel();
+        };
+        this.upSmsFail = function (err) {
+            me.conf.upSmsFailFn && typeof me.conf.upSmsFailFn === 'function' && me.conf.upSmsFailFn(err);
+            me._stopChannel();
+        };
+        this.hideUpSmsDialogFn = function () {
+            me.base.hide('upsms-dialog-wrapper');
+        };
+        this.init();
+    };
+
+    var _upSmsDialog = passport.upSmsDialog;
+
+    _upSmsDialog.prototype = {
+        asyncOptions(conf, options) {
+            var _conf = {};
+            if (Object.prototype.toString.call(conf) !== '[object Object]') {
+                _conf = {
+                    conf
+                };
+            };
+            if (Object.prototype.toString.call(options) !== '[object Object]') {
+                _conf[options] = options;
+            } else {
+                _conf = conf;
+                for (var key in options) {
+                    if (options.hasOwnProperty(key)) {
+                        var f = false;
+                        for (var key2 in _conf) {
+                            if (key === key2 && options[key] !== _conf[key2]) {
+                                _conf[key2] = options[key];
+                                f = true;
+                            }
+                        }
+                        if (!f && !_conf[key]) {
+                            _conf[key] = options[key];
+                        }
+                    }
+                }
+            }
+            return _conf;
+        },
+        // 全角转半角
+        /* eslint-disable fecs-camelcase */
+        _SBCtoDBC: function (str) {
+            var result = '';
+            if (str) {
+                var len = str.length;
+                for (var i = 0; i < len; i++) {
+                    var cCode = str.charCodeAt(i);
+                    // 全角与半角相差（除空格外）：65248（十进制）
+                    cCode = (cCode >= 0xFF01 && cCode <= 0xFF5E) ? (cCode - 65248) : cCode;
+                    // 处理空格
+                    cCode = (cCode === 0x03000) ? 0x0020 : cCode;
+                    result += String.fromCharCode(cCode);
+                }
+                return result;
+            } else {
+                return;
+            }
+        },
+        guideRandom: function () {
+            return 'xxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0;
+                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }).toUpperCase();
+        },
+        _setChannel: function (options) {
+            var me = this;
+            me._stopChannel();
+            function _setChannelAfterFn() {
+                me.base.getEleById('upsms-dialog-dymicNum')
+                && (me.base.getEleById('upsms-dialog-dymicNum').innerText = me.dataStore.dymicNum);
+                me.base.getEleById('upsms-dialog-dymicPhone')
+                && (me.base.getEleById('upsms-dialog-dymicPhone').innerText = me.dataStore.dymicPhone);
+                me.base.show('upsms-dialog-wrapper');
+                if (me.dataStore.sigin) {
+                    me._createChannel(me.dataStore.sigin, options);
+                }
+            };
+            if (me.conf.ajaxFn && typeof me.conf.ajaxFn === 'function') {
+                var params = {
+                    from: options.from,
+                    data: me._SBCtoDBC(options.phoneVal),
+                    typenode: '_setChannel'
+                };
+                me.conf.ajaxFn(me.httpStore.setChannelUrl, params, function (res) {
+                    var rsp = res;
+                    rsp.captcha && (me.dataStore.dymicNum = rsp.captcha);
+                    rsp.channelCode
+                    && (me.dataStore.dymicPhone = (rsp.channelCode + '').replace(/\s/g, '').replace(/(.{4})/g, '$1 '));
+                    if (rsp.channelId) {
+                        me.dataStore.sigin = me.dataStore.upsms_id = rsp.channelId;
+                    }
+                    // console.log('_setChannel-ajaxFn-suc:', res, me.dataStore);
+                    _setChannelAfterFn();
+                }, function (err) {
+                    // console.log('_setChannel-ajaxFn-fail:', err);
+                    me.upSmsFail({
+                        errcode: err.errno || 503,
+                        errType: '_setChannel_ajaxFn_err',
+                        msg: '上行短信失败(503)',
+                        type: '_setChannel_fail'
+                    });
+                });
+            } else {
+                me.dataStore.dymicNum = me.conf.dymicNum;
+                me.dataStore.dymicPhone = me.conf.dymicPhone;
+                me.dataStore.sigin = me.dataStore.upsms_id = me.conf.sigin;
+                _setChannelAfterFn();
+            };
+        },
+        _stopChannel() {
+            this.dataStore.sigin && (this.dataStore.sigin = '');
+        },
+        _createChannel(sigin, options) {
+            var me = this;
+            if (!me.dataStore.sigin) {
+                return false;
+            };
+            var _sigin = sigin || me.dataStore.sigin;
+            var tpl = options.product || 'pp';
+            var url = me.httpStore.createChannelUrl + '?channel_id='
+                    + _sigin + '&gid=' + (me.guideRandom() || '') + '&tpl=' + tpl + '&_sdkFrom=1';
+            // console.log('_createChannel:', sigin, options, url);
+            if (me.conf.ajaxFn && typeof me.conf.ajaxFn === 'function') {
+                var params = {
+                    apiver: 'v3',
+                    tt: new Date().getTime(),
+                    typenode: '_createChannel'
+                };
+                me.conf.ajaxFn(url, params, function (res) {
+                    function resultHander(d) {
+                        if (d.channel_v && d.channel_v.u) {
+                            d.channel_v.u = decodeURIComponent(d.channel_v.u);
+                        }
+                        if (+d.errno === 0 && +d.channel_v === 1) {
+                            // alert('上行短信成功');
+                            me.upSmsDone(d);
+                        } else {
+                            if (me.dataStore.sigin) {
+                                me._createChannel(me.dataStore.sigin, options);
+                            }
+                        }
+                    };
+                    if (res) {
+                        resultHander(res);
+                    } else {
+                        me.upSmsFail({
+                            errcode: 502,
+                            errType: '_createChannel request err',
+                            msg: '上行短信失败(502)',
+                            type: '_createChannel_fail'
+                        });
+                    }
+                }, function (err) {
+                    console.log('ajaxFn_err_2:', err);
+                    me.upSmsFail({
+                        errcode: 501,
+                        errType: 'ajaxFn_err_2',
+                        msg: '上行短信失败(501)',
+                        type: '_createChannel_fail2'
+                    });
+                });
+            } else {
+                me._stopChannel();
+            };
+        }
+    };
+    _upSmsDialog.instance = null;
+
+    _upSmsDialog.createInstance = function (options) {
+        if (!_upSmsDialog.instance) {
+            _upSmsDialog.instance = new _upSmsDialog(options);
+        };
+        return _upSmsDialog.instance;
+    };
+})();;�� ��      d	Y�d	Y�EW�d	��   h    O^partitionKey=%28https%2Cbaidu.com%29,:https://passport.baidu.com/passApi/js/uni_armorwidget_wrapper.js necko:classified 1 strongly-framed 1 security-info FnhllAKWRHGAlo+ESXykKAAAAAAAAAAAwAAAAAAAAEaphjojH6pBabDSgSnsfLHeAAAAAgAAAAAAAAAAAAAAAAAAAAEAOQFmCjImkVxP+7sgiYWmMt8FvcOXmlQiTNWFiWlrbpbqgwAAAAAAAAoWMIIKEjCCCPqgAwIBAgIMRBfOhu+C7GkhzG9oMA0GCSqGSIb3DQEBCwUAMFAxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSYwJAYDVQQDEx1HbG9iYWxTaWduIFJTQSBPViBTU0wgQ0EgMjAxODAeFw0yMjA3MDUwNTE2MDJaFw0yMzA4MDYwNTE2MDFaMIGnMQswCQYDVQQGEwJDTjEQMA4GA1UECBMHYmVpamluZzEQMA4GA1UEBxMHYmVpamluZzElMCMGA1UECxMcc2VydmljZSBvcGVyYXRpb24gZGVwYXJ0bWVudDE5MDcGA1UEChMwQmVpamluZyBCYWlkdSBOZXRjb20gU2NpZW5jZSBUZWNobm9sb2d5IENvLiwgTHRkMRIwEAYDVQQDEwliYWlkdS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCqL8xBjSWug+n0J8QAszlvDpgqVX0H5YBJgvrT04WYtd97b7sC3e145AwHK54ehkv2aoZY11dvIVkR2G+WbtLeNij2tOPOlTIpAMFljmmwAP5SN/SIP4ttD7vw7MXAMe+ttQwGZq2+3EMTxGawXc9WU+LRloIcBrubX+1gjdLt89JQ7rvNsjaXyM570ku3XLSIyjdui875lv209Ue1IHe7/KidgbJs+McJat0iboM/p1Pf8dovKWsiw+kdZejFoLoTThY/A5PwpVmKGoDoJ31JI9/R+UuXtwHEGfXxxf+RM9ChdMbu1M/2OAztvV6qRPuI93uZcHY0VX5V0g+ev5STAgMBAAGjggaSMIIGjjAOBgNVHQ8BAf8EBAMCBaAwgY4GCCsGAQUFBwEBBIGBMH8wRAYIKwYBBQUHMAKGOGh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcnNhb3Zzc2xjYTIwMTguY3J0MDcGCCsGAQUFBzABhitodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc3JzYW92c3NsY2EyMDE4MFYGA1UdIARPME0wQQYJKwYBBAGgMgEUMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAgGBmeBDAECAjAJBgNVHRMEAjAAMD8GA1UdHwQ4MDYwNKAyoDCGLmh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3Nyc2FvdnNzbGNhMjAxOC5jcmwwggNhBgNVHREEggNYMIIDVIIJYmFpZHUuY29tggxiYWlmdWJhby5jb22CDHd3dy5iYWlkdS5jboIQd3d3LmJhaWR1LmNvbS5jboIPbWN0LnkubnVvbWkuY29tggthcG9sbG8uYXV0b4IGZHd6LmNuggsqLmJhaWR1LmNvbYIOKi5iYWlmdWJhby5jb22CESouYmFpZHVzdGF0aWMuY29tgg4qLmJkc3RhdGljLmNvbYILKi5iZGltZy5jb22CDCouaGFvMTIzLmNvbYILKi5udW9taS5jb22CDSouY2h1YW5rZS5jb22CDSoudHJ1c3Rnby5jb22CDyouYmNlLmJhaWR1LmNvbYIQKi5leXVuLmJhaWR1LmNvbYIPKi5tYXAuYmFpZHUuY29tgg8qLm1iZC5iYWlkdS5jb22CESouZmFueWkuYmFpZHUuY29tgg4qLmJhaWR1YmNlLmNvbYIMKi5taXBjZG4uY29tghAqLm5ld3MuYmFpZHUuY29tgg4qLmJhaWR1cGNzLmNvbYIMKi5haXBhZ2UuY29tggsqLmFpcGFnZS5jboINKi5iY2Vob3N0LmNvbYIQKi5zYWZlLmJhaWR1LmNvbYIOKi5pbS5iYWlkdS5jb22CEiouYmFpZHVjb250ZW50LmNvbYILKi5kbG5lbC5jb22CCyouZGxuZWwub3JnghIqLmR1ZXJvcy5iYWlkdS5jb22CDiouc3UuYmFpZHUuY29tgggqLjkxLmNvbYISKi5oYW8xMjMuYmFpZHUuY29tgg0qLmFwb2xsby5hdXRvghIqLnh1ZXNodS5iYWlkdS5jb22CESouYmouYmFpZHViY2UuY29tghEqLmd6LmJhaWR1YmNlLmNvbYIOKi5zbWFydGFwcHMuY26CDSouYmR0anJjdi5jb22CDCouaGFvMjIyLmNvbYIMKi5oYW9rYW4uY29tgg8qLnBhZS5iYWlkdS5jb22C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BQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCAYGZ4EMAQICMAkGA1UdEwQCMAAwPwYDVR0fBDgwNjA0oDKgMIYuaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc3JzYW92c3NsY2EyMDE4LmNybDCCA2EGA1UdEQSCA1gwggNUggliYWlkdS5jb22CDGJhaWZ1YmFvLmNvbYIMd3d3LmJhaWR1LmNughB3d3cuYmFpZHUuY29tLmNugg9tY3QueS5udW9taS5jb22CC2Fwb2xsby5hdXRvggZkd3ouY26CCyouYmFpZHUuY29tgg4qLmJhaWZ1YmFvLmNvbYIRKi5iYWlkdXN0YXRpYy5jb22CDiouYmRzdGF0aWMuY29tggsqLmJkaW1nLmNvbYIMKi5oYW8xMjMuY29tggsqLm51b21pLmNvbYINKi5jaHVhbmtlLmNvbYINKi50cnVzdGdvLmNvbYIPKi5iY2UuYmFpZHUuY29tghAqLmV5dW4uYmFpZHUuY29tgg8qLm1hcC5iYWlkdS5jb22CDyoubWJkLmJhaWR1LmNvbYIRKi5mYW55aS5iYWlkdS5jb22CDiouYmFpZHViY2UuY29tggwqLm1pcGNkbi5jb22CECoubmV3cy5iYWlkdS5jb22CDiouYmFpZHVwY3MuY29tggwqLmFpcGFnZS5jb22CCyouYWlwYWdlLmNugg0qLmJjZWhvc3QuY29tghAqLnNhZmUuYmFpZHUuY29tgg4qLmltLmJhaWR1LmNvbYISKi5iYWlkdWNvbnRlbnQuY29tggsqLmRsbmVsLmNvbYILKi5kbG5lbC5vcmeCEiouZHVlcm9zLmJhaWR1LmNvbYIOKi5zdS5iYWlkdS5jb22CCCouOTEuY29tghIqLmhhbzEyMy5iYWlkdS5jb22CDSouYXBvbGxvLmF1dG+CEioueHVlc2h1LmJhaWR1LmNvbYIRKi5iai5iYWlkdWJjZS5jb22CESouZ3ouYmFpZHViY2UuY29tgg4qLnNtYXJ0YXBwcy5jboINKi5iZHRqcmN2LmNvbYIMKi5oYW8yMjIuY29tggwqLmhhb2thbi5jb22CDyoucGFlLmJhaWR1LmNvbYIRKi52ZC5iZHN0YXRpYy5jb22CESouY2xvdWQuYmFpZHUu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 request-method GET request-Accept-Encoding gzip, deflate, br response-head HTTP/1.1 200 OK
+Content-Type: application/x-javascript
+Date: Thu, 09 Mar 2023 04:00:42 GMT
+Etag: W/"6406e7fd-40bf"
+Last-Modified: Tue, 07 Mar 2023 07:30:05 GMT
+Server: BWS
+Strict-Transport-Security: max-age=31536000
+Tracecode: 41605829380217485322030912
+Vary: Accept-Encoding
+ original-response-headers Connection: keep-alive
+Content-Type: application/x-javascript
+Date: Thu, 09 Mar 2023 04:00:42 GMT
+Etag: W/"6406e7fd-40bf"
+Last-Modified: Tue, 07 Mar 2023 07:30:05 GMT
+Server: BWS
+Strict-Transport-Security: max-age=31536000
+Tracecode: 41605829380217485322030912
+Vary: Accept-Encoding
+Transfer-Encoding: chunked
+ ctid 2 uncompressed-len 0 net-response-time-onstart 1106 net-response-time-onstop 3061   @�

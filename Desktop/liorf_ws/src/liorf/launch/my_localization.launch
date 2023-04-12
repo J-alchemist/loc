@@ -1,0 +1,18 @@
+<launch>
+    <param name="use_sim_time" value="true" />
+
+    <arg name="project" default="liorf"/>
+    
+    <!-- Parameters -->
+    <rosparam file="$(find liorf)/config/kitti_loc.yaml" command="load" />
+    <!-- <rosparam file="$(find liorf)/config/my_loc.yaml" command="load" /> -->
+
+    <!--- LOAM -->
+    <node pkg="$(arg project)" type="$(arg project)_imuPreintegration"   name="$(arg project)_imuPreintegration"    output="screen" 	respawn="false"/> 
+    <node pkg="$(arg project)" type="$(arg project)_imageProjection"     name="$(arg project)_imageProjection"      output="screen"     respawn="false"/>
+    <node pkg="$(arg project)" type="$(arg project)_reLoc"               name="$(arg project)_reLoc"                output="screen"     respawn="false"/>
+    
+    <!--- Run Rviz-->
+    <node pkg="rviz" type="rviz" name="$(arg project)_rviz" args="-d $(find liorf)/launch/include/config/rviz2.rviz" />
+
+</launch>

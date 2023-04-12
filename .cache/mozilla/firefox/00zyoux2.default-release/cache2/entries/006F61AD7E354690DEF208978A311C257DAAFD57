@@ -1,0 +1,329 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Parameter Setting</title>
+<style type="text/css">
+<!--
+.STYLE1 {font-weight: bold}
+.STYLE2 {	font-family: "Times New Roman", Times, serif;
+font-size: 18px;
+font-weight: bold;
+}
+.STYLE3 {font-family: "Times New Roman", Times, serif}
+-->
+</style>
+<style type="text/css">
+.tabs { 
+display: block;
+display: -webkit-flex;
+display: -moz-flex;
+display: flex;
+-webkit-flex-wrap: wrap;
+-moz-flex-wrap: wrap;
+flex-wrap: wrap;
+margin: 0;
+overflow: hidden; }
+.tabs [class^="tab"] label,
+.tabs [class*=" tab"] label {
+cursor: pointer;
+display: block;
+font-size: 1.1em;
+font-weight: 300;
+line-height: 1em;
+padding: 2rem 0;
+text-align: center; }
+.tabs [class^="tab"] [type="radio"],
+.tabs [class*=" tab"] [type="radio"] {
+cursor: pointer;
+-webkit-appearance: none;
+-moz-appearance: none;
+appearance: none;
+display: block;
+width: 100%;
+-webkit-transition: all 0.3s ease-in-out;
+-moz-transition: all 0.3s ease-in-out;
+-o-transition: all 0.3s ease-in-out;
+transition: all 0.3s ease-in-out; }
+.tabs [class^="tab"] [type="radio"]:hover, .tabs [class^="tab"] [type="radio"]:focus,
+.tabs [class*=" tab"] [type="radio"]:hover,
+.tabs [class*=" tab"] [type="radio"]:focus {
+border-bottom: 1px solid #00ff00;
+}
+.tabs [class^="tab"] [type="radio"]:checked,
+.tabs [class*=" tab"] [type="radio"]:checked {
+border-bottom: 2px solid #00ff00; 
+}
+.tabs [class^="tab"] [type="radio"]:checked + div,
+.tabs [class*=" tab"] [type="radio"]:checked + div {
+opacity: 1; }
+.tabs [class^="tab"] [type="radio"] + div,
+.tabs [class*=" tab"] [type="radio"] + div {
+display: block;
+opacity: 0;
+padding: 2rem 0;
+width: 90%;
+-webkit-transition: all 0.3s ease-in-out;
+-moz-transition: all 0.3s ease-in-out;
+-o-transition: all 0.3s ease-in-out;
+transition: all 0.3s ease-in-out; }
+.tabs .tab-2 {
+width: 25%; }
+.tabs .tab-2 [type="radio"] + div {
+width: 200%;
+margin-left: 200%; }
+.tabs .tab-2 [type="radio"]:checked + div {
+margin-left: 0; }
+.tabs .tab-2:last-child [type="radio"] + div {
+margin-left: 100%; }
+.tabs .tab-2:last-child [type="radio"]:checked + div {
+margin-left: -100%; }
+</style>
+</head>
+<body>
+<img src = "../logo.png" align="left" width="207" height="60">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<form id="form1" form style="float:left" name="device_info" method="post" action="/cgi-bin/device_info.cgi">
+<label> <span class="STYLE1">
+<input name="device_btn" type="submit" value="Device" />
+</span></label>
+</form>
+<form id="form2" form style="float:left" name="param_setting" method="post" action="/cgi-bin/param_setting.cgi">
+<input name="setting_btn" type="submit" value="Setting" style="background-color: #00FF00" />
+</form>
+<form id="form3" form style="float:left" name="diagnostic_info" method="post" action="/cgi-bin/diagnostic_info.cgi">
+<strong>
+<input name="diag_btn" type="submit" id="diag_btn" value="Diagnostic" />
+</strong>
+</form>
+<form id="form4" name="firmware_update" method="post" action="/cgi-bin/firmware_update.cgi">
+<strong>
+<input name="system_btn" type="submit" id="setting_btn" value="System" />
+</strong>
+</form>
+<p>&nbsp;</p>
+<!-- 2.0: multipart/form-data is required for file uploads. --><form method="POST" enctype="multipart/form-data" 	action="/cgi-bin/param_setting.cgi">
+<div class="tabs">
+<div class="tab-2">
+<label for="tab2-1">General Setting</label>
+<input id="tab2-1" name="tabs-two" type="radio" checked="checked">
+<div>
+<table>
+<tr>
+<td class="STYLE3">Device IP Address:</td>
+<td class="STYLE3"><input type="text" name="device_ip_addr"  style="width:150px" value="192.168.1.200" /></td>
+</tr>
+<tr>
+<td class="STYLE3">Device IP Mask:</td>
+<td class="STYLE3"><input type="text" name="device_ip_mask" style="width:150px" value="255.255.255.0" /></td>
+</tr>
+<tr>
+<td class="STYLE3">Device IP Gateway:</td>
+<td class="STYLE3"><input type="text" name="device_ip_gateway" style="width:150px" value="192.168.1.1" /></td>
+</tr>
+<tr>
+<td class="STYLE3">Destination IP Address:</td>
+<td class="STYLE3"><input type="text" name="des_ip_addr" style="width:150px" value="192.168.1.102" /></td>
+</tr>
+<tr>
+<td class="STYLE3">MSOP Port Number(1025~65535):</td>
+<td class="STYLE3"><input type="text" name="lidar_msop_port" style="width:150px" value="6699" /></td>
+</tr>
+<tr>
+<td class="STYLE3">DIFOP Port Number(1025~65535): </td>
+<td class="STYLE3"><input type="text" name="lidar_difop_port" style="width:150px" value="7788" /></td>
+</tr>
+<tr>
+<td class="STYLE3">Return Mode:</td>
+<td class="STYLE3"><select name="RetModeSel">
+[param_setting.c ShowParamSetHtml 752] before retWaveModeTop:4<option value="Strongest" selected = "" >Strongest
+<option value="Last">Last
+<option value="First">First
+<option value="Dual">Dual
+</select></td>
+</tr>
+<tr>
+<td class="STYLE3">FOV Setting(0~360):</td>
+<td class="STYLE3"><input type="text" style="width:70px" name="lidar_fov_start" value="0" />to<input type="text" style="width:70px" name="lidar_fov_end" value="10" />DEG</td>
+</tr>
+<tr>
+<td class="STYLE3">Phase Lock Setting(0~360):</td>
+<td class="STYLE3"><input type="text" name="phase_lock" style="width:150px" value="0" />DEG</td>
+</tr>
+<tr>
+<td class="STYLE3">Rotation Speed(0/600/1200):</td>
+<td class="STYLE3"><input type="text" name="rotation_speed" style="width:150px" value="600" />RPM</td>
+</tr>
+<tr>
+<td class="STYLE3">Time Synchronization Source: </td>
+<td class="STYLE3"><select name="TimeSyncSrc">
+<option value="GPS"  >GPS
+<option value="PTP-E2E">PTP-E2E
+<option value="PTP-P2P">PTP-P2P
+<option value="PTP-GPTP" selected = "">PTP-GPTP
+</select></td>
+</tr>
+<tr class="STYLE3"><td>Operation Mode:</td>
+<td class="STYLE3"><select name="OperateMode">
+<option value="Standby">Standby
+<option value="High Performance" selected = "">High Performance
+</select></td>
+</tr>
+<tr>
+<td class="STYLE3">Reflectivity Enhance:</td>
+<td class="STYLE3"><select name="reflectivityModeSel">
+<option value="On" selected = "" >On
+<option value="Off">Off
+</select></td>
+</tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr><td></td><td></td></tr>
+<tr>
+<td class="STYLE3"></td>
+<td class="STYLE3"><input type="submit" name="save_param" value="Save" /></td>
+</tr>
+</table>
+</div>
+</div>
+<div class="tab-2">
+<label for="tab2-2">Angle Pulse Setting</label>
+<input id="tab2-2" name="tabs-two" type="radio">
+<div>
+<table>
+<tr>
+<td class="STYLE2">Trigger Mode: </td>
+<td class="STYLE3"><input type="checkbox" name="mode1" id="mode1" value="Mode1(+25%)" onclick="mode1Click(this);" checked>Mode1(+25%)</td>
+<td class="STYLE3"><input type="checkbox" name="mode2" id="mode2" value="Mode2" onclick="mode2Click(this);" >Mode2</td>
+</tr>
+<tr>
+<td class="STYLE2">Group Switch: </td>
+<td class="STYLE3"><input type="checkbox" id="all_on" value="All On" onclick="allOnClick(this);">All On</td>
+<td class="STYLE3"><input type="checkbox" id="all_off" value="All Off" onclick="allOffClick(this);" checked>All Off</td>
+</tr>
+</table>
+<table border="1">
+<tr>
+<th class="STYLE2" align="center">Group</th>
+<th class="STYLE2" align="center">Pulse Trigger Switch</th>
+<th class="STYLE2" align="center">Pulse Start Angle</th>
+<th class="STYLE2" align="center">Pulse Width</th>
+<th class="STYLE2" align="center">Pulse Step</th>
+</tr>
+<tr>
+<td class="STYLE3">First Group: </td>
+<td class="STYLE3" align="center"><input type="checkbox" name="first_group_switch" id="first_group_switch" value="ON" onclick="groupClick(this);" >ON</td>
+<td class="STYLE3"><input type="text" name="first_start_angle" id="first_start_angle" value="0.0" style="width:100px" disabled />DEG</td>
+<td class="STYLE3"><input type="text" name="first_pulse_width" id="first_pulse_width" value="10000000" style="width:100px" disabled />ns</td>
+<td class="STYLE3"><input type="text" name="first_pulse_step" id="first_pulse_step" value="360.00" style="width:100px" disabled />DEG</td>
+</tr>
+<tr>
+<td class="STYLE3">Second Group: </td>
+<td class="STYLE3" align="center"><input type="checkbox" name="second_group_switch" id="second_group_switch" value="ON" onclick="groupClick(this);" >ON</td>
+<td class="STYLE3"><input type="text" name="second_start_angle" id="second_start_angle" value="0.0" style="width:100px" disabled />DEG</td>
+<td class="STYLE3"><input type="text" name="second_pulse_width" id="second_pulse_width" value="10000000" style="width:100px" disabled />ns</td>
+<td class="STYLE3"><input type="text" name="second_pulse_step" id="second_pulse_step" value="360.00" style="width:100px" disabled />DEG</td>
+</tr>
+<script>
+function mode1Click(obj){
+    if(obj.checked) {
+        document.getElementById("mode2").checked = "";
+    }
+    else {
+        document.getElementById("mode2").checked = "checked";
+    }
+}
+</script>
+<script>
+function mode2Click(obj){
+    if(obj.checked) {
+        document.getElementById("mode1").checked = "";
+    }
+    else {
+        document.getElementById("mode1").checked = "checked";
+    }
+}
+</script>
+<script>
+function groupClick(obj){
+    if(document.getElementById("first_group_switch").checked && 
+       document.getElementById("second_group_switch").checked) {
+          document.getElementById("all_on").checked = "checked";
+    }
+    else if(document.getElementById("first_group_switch").checked == "" && 
+            document.getElementById("second_group_switch").checked == "") {
+              document.getElementById("all_off").checked = "checked";
+    }
+    else{
+       document.getElementById("all_on").checked = "";
+       document.getElementById("all_off").checked = "";
+        }
+    if(document.getElementById("first_group_switch").checked) {
+          document.getElementById("first_start_angle").disabled = ""; 
+          document.getElementById("first_pulse_width").disabled = ""; 
+          document.getElementById("first_pulse_step").disabled = ""; 
+    }
+    else{
+          document.getElementById("first_start_angle").disabled = "disabled"; 
+          document.getElementById("first_pulse_width").disabled = "disabled"; 
+          document.getElementById("first_pulse_step").disabled = "disabled"; 
+        }
+    if(document.getElementById("second_group_switch").checked) {
+          document.getElementById("second_start_angle").disabled = ""; 
+          document.getElementById("second_pulse_width").disabled = ""; 
+          document.getElementById("second_pulse_step").disabled = ""; 
+    }
+    else{
+          document.getElementById("second_start_angle").disabled = "disabled"; 
+          document.getElementById("second_pulse_width").disabled = "disabled"; 
+          document.getElementById("second_pulse_step").disabled = "disabled"; 
+        }
+}
+</script>
+<script>
+function allOnClick(obj){
+    if(obj.checked) {
+        document.getElementById("first_group_switch").checked = "checked";
+        document.getElementById("second_group_switch").checked = "checked";
+        document.getElementById("all_off").checked = "";
+        groupClick(document.getElementById("first_group_switch"));
+        groupClick(document.getElementById("second_group_switch"));
+    }
+}
+</script>
+<script>
+function allOffClick(obj){
+    if(obj.checked) {
+        document.getElementById("first_group_switch").checked = "";
+        document.getElementById("second_group_switch").checked = "";
+        document.getElementById("all_on").checked = "";
+        groupClick(document.getElementById("first_group_switch"));
+        groupClick(document.getElementById("second_group_switch"));
+    }
+}
+</script>
+<table width="300" >
+<tr><td style="width:300px"></td><td></td><td></td></tr>
+<tr><td style="width:300px"></td><td></td><td></td></tr>
+<tr><td style="width:300px"></td><td></td><td></td></tr>
+<tr><td style="width:300px"></td><td></td>
+<td class="STYLE3"><input type="submit" name="save_param_pulse" id="save_param_pulse" value="Save" /></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</form>
+</body>
+</html>
+�-5n癩      c捨謈捨譋岬c捨�   e    O^partitionKey=%28http%2C192.168.1.200%29,~1670565550,:http://192.168.1.200/cgi-bin/param_setting.cgi necko:classified 1 strongly-framed 0 request-method POST response-head HTTP/1.0 200 OK
+regVal: 4, 1, 0
+Content-type: text/html;charset=utf-8
+ original-response-headers regVal: 4
+regVal: 1
+regVal: 0
+Content-type: text/html;charset=utf-8
+ ctid 1 uncompressed-len 0 net-response-time-onstart 47 net-response-time-onstop 51   .j
